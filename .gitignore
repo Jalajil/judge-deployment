@@ -1,0 +1,12 @@
+# Virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Environment files (secrets)
+.env
+
+# Cursor settings (if they appear)
+.cursor/
