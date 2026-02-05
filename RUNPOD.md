@@ -32,4 +32,3 @@ These are configured on the endpoint (not committed as secrets). For local runs,
 ## Notes
 
 - Any settings not listed here are left at Runpod defaults.
-

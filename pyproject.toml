@@ -8,4 +8,6 @@ dependencies = [
     "openai>=2.16.0",
     "python-dotenv>=1.2.1",
     "requests>=2.31.0",
+    "fastapi",
+    "uvicorn[standard]",
 ]
