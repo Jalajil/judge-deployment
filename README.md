@@ -2,6 +2,8 @@
 
 A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court cases. Given the facts of a case, it generates the court's reasoning and verdict text for both first-instance and appeal courts.
 
+The model is unable to answer any judicial question, it is trained specifically to predict the reasoning (الاسباب) and the verdict (نص الحكم) of a case.
+
 To use the model please visit: **[القاضي السعودي — Saudi Judge](https://judge-deployment.vercel.app/)**
 
 ## Model Capabilities
@@ -99,6 +101,7 @@ Any settings not listed here are left at RunPod defaults.
 
 `banned_tokens.json` contains token IDs that are suppressed at generation time via `logit_bias: -100`. The API loads this file on startup and passes it to every chat completion request.
 
-## Note
+## Notes
+The model is unable to 
 Cold start is mostly ~2 minutes.
 When the model keeps generating open a new page.
