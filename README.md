@@ -89,7 +89,7 @@ Any settings not listed here are left at RunPod defaults.
 
 ## AWQ Quantization (for vLLM usage)
 
-`quantize_awq_llm-compressor.ipynb` quantizes the 14B Qwen3 model to AWQ 4-bit using **llm-compressor**. Takes ~30-45 minutes on an A100 (40 GB+) pod.
+`quantize_awq_llm-compressor.ipynb` quantizes the 14B Qwen3 model to AWQ 4-bit using **llm-compressor**. Takes ~30-45 minutes on an A100 (40 GB) pod.
 
 ## Config Fix
 
@@ -98,3 +98,7 @@ Any settings not listed here are left at RunPod defaults.
 ## Banned Tokens
 
 `banned_tokens.json` contains token IDs that are suppressed at generation time via `logit_bias: -100`. The API loads this file on startup and passes it to every chat completion request.
+
+## Note
+Cold start is mostly ~2 minutes.
+When the model keeps generating open a new page.
