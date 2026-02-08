@@ -1,4 +1,33 @@
-# Saudi Judge — vLLM Deployment
+# Saudi Judge (القاضي السعودي)
+
+A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court cases. Given the facts of a case, it generates the court's reasoning and verdict text for both first-instance and appeal courts.
+
+## Model Capabilities
+
+- **First-instance courts**: takes case facts (الوقائع) and generates reasoning (الأسباب) and verdict text (نص الحكم).
+- **Appeal courts**: takes the full first-instance judgment plus appeal facts and generates the appeal court's reasoning and verdict.
+- Supports the thinking/reasoning mode inherited from Qwen3, visible in the chat UI as a collapsible "thinking" block.
+
+### Training Data
+
+The model was trained on **43,000+** judicial decisions scraped from the [Saudi Ministry of Justice judicial decisions portal](https://laws.moj.gov.sa/ar/JudicialDecisionsList/1?pageNumber=1&pageSize=12&viewType=grid&courtTypes=1&sortingBy=3), plus **~15,000** reasoning-augmented examples. The raw verdicts went through an extensive cleaning pipeline before training:
+
+1. **Header normalization** — recognizing and standardizing section headers (الوقائع / الأسباب / نص الحكم) across dozens of aliases, bracketed forms, and corrupted variants.
+2. **NER anonymization** — replacing person names, organizations, and locations with placeholders (`[PER-1]`, `[ORG-2]`, `[LOC-3]`) using CAMeL Tools NER, with special handling for Islamic jurisprudence terms, judge signatures, proxy numbers, and invoice numbers.
+3. **Text normalization** — Unicode reformatting, encoding fixes, tatweel stripping, Eastern-to-Western numeral conversion, Arabic comma/period structuring, and duplicate paragraph detection.
+4. **Quality filtering** — NVIDIA NeMo Curator pipelines for deduplication and content-quality scoring.
+5. **ChatML conversion** — structuring each case into user/assistant message pairs with task-specific instructions for first-instance and appeal court scenarios.
+
+### Training Setup
+
+| | |
+|---|---|
+| Base model | [Qwen3-14B](https://huggingface.co/Qwen/Qwen3-14B) (4-bit QLoRA via Unsloth) |
+| Method | SFT with TRL |
+| Quantization | AWQ 4-bit via llm-compressor for inference |
+| HF model | [`aljalajil/saudi-judge-awq`](https://huggingface.co/aljalajil/saudi-judge-awq) |
+
+## Deployment
 
 Chat UI + API proxy for the **saudi-judge-awq** model running on a RunPod vLLM endpoint.
 
