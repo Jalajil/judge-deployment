@@ -2,6 +2,8 @@
 
 A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court cases. Given the facts of a case, it generates the court's reasoning and verdict text for both first-instance and appeal courts.
 
+To use the model please visit: **[القاضي السعودي — Saudi Judge](https://judge-deployment.vercel.app/)**
+
 ## Model Capabilities
 
 - **First-instance courts**: takes case facts (الوقائع) and generates reasoning (الأسباب) and verdict text (نص الحكم).
