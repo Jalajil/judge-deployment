@@ -1,0 +1,14 @@
+{
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": { "includeFiles": ["banned_tokens.json"] }
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
