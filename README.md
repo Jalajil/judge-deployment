@@ -87,7 +87,7 @@ Any settings not listed here are left at RunPod defaults.
 
 ## AWQ Quantization (for vLLM usage)
 
-`quantize_awq_llm-compressor.ipynb` quantizes the 14B Qwen3 model to AWQ 4-bit using **llm-compressor**. Requires an A100 (40 GB+) pod and takes ~30-45 minutes.
+`quantize_awq_llm-compressor.ipynb` quantizes the 14B Qwen3 model to AWQ 4-bit using **llm-compressor**. Takes ~30-45 minutes on an A100 (40 GB+) pod.
 
 ## Config Fix
 
