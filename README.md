@@ -10,11 +10,11 @@ A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court 
 
 ### Training Data
 
-The model was trained on **43,000+** judicial decisions scraped from the [Saudi Ministry of Justice judicial decisions portal](https://laws.moj.gov.sa/ar/JudicialDecisionsList/1?pageNumber=1&pageSize=12&viewType=grid&courtTypes=1&sortingBy=3), plus **~15,000** reasoning-augmented examples. The raw verdicts went through an extensive cleaning pipeline before training:
+The model was trained on **43,000+** judicial decisions scraped from the [Saudi Ministry of Justice judicial decisions portal](https://laws.moj.gov.sa/ar/JudicialDecisionsList/1?pageNumber=1&pageSize=12&viewType=grid&courtTypes=1&sortingBy=3), plus **~15,000** reasoning-augmented math examples, yes it is unrelated to our case but it is used to retain the reasoning capability of the model. The raw verdicts went through an extensive cleaning pipeline before training:
 
 1. **Header normalization** — recognizing and standardizing section headers (الوقائع / الأسباب / نص الحكم) across dozens of aliases, bracketed forms, and corrupted variants.
-2. **NER anonymization** — replacing person names, organizations, and locations with placeholders (`[PER-1]`, `[ORG-2]`, `[LOC-3]`) using CAMeL Tools NER, with special handling for Islamic jurisprudence terms, judge signatures, proxy numbers, and invoice numbers.
-3. **Text normalization** — Unicode reformatting, encoding fixes, tatweel stripping, Eastern-to-Western numeral conversion, Arabic comma/period structuring, and duplicate paragraph detection.
+2. **NER anonymization** — replacing person names, organizations, and locations with placeholders (`[PER-1]`, `[ORG-2]`, `[LOC-3]`) using CAMeL Tools NER, with special handling for judge signatures, proxy numbers, and invoice numbers.
+3. **Text normalization** — Unicode reformatting, encoding fixes, tatweel stripping, Eastern-to-Western Arabic numeral conversion, Arabic comma/period structuring, and duplicate paragraph detection.
 4. **Quality filtering** — NVIDIA NeMo Curator pipelines for deduplication and content-quality scoring.
 5. **ChatML conversion** — structuring each case into user/assistant message pairs with task-specific instructions for first-instance and appeal court scenarios.
 
@@ -41,19 +41,19 @@ Chat UI + API proxy for the **saudi-judge-awq** model running on a RunPod vLLM e
 ├── pyproject.toml        # Python dependencies
 ├── runpod_endpoint.py    # Standalone CLI test script
 ├── fix_config.py         # Patches HF config.json for vLLM compat
-└── quantize_awq_llm-compressor.ipynb  # AWQ quantization notebook
+└── quantize_awq_llm-compressor.ipynb  # AWQ quantization notebook to use in vLLM
 ```
 
 ## Local Development
 
 ```powershell
-& .venv311\Scripts\Activate.ps1
+& .venv\Scripts\Activate.ps1
 $env:RUNPOD_API_KEY = "your-runpod-api-key"
 $env:ENDPOINT_ID = "your-endpoint-id"
-uvicorn api.index:app --reload --port 8001
+uvicorn api.index:app --reload --port 8000
 ```
 
-Open http://localhost:8001/
+Open http://localhost:8000/
 
 ## Vercel Deployment
 
@@ -70,7 +70,7 @@ Settings configured in the RunPod UI (not in code). Non-default values we rely o
 |---|---|
 | Engine | vLLM |
 | GPU memory | 48 GB |
-| Idle timeout | 25 s |
+| Idle timeout | 60 s |
 | Container image | `madiatorlabs/worker-v1-vllm:v0.15.2` |
 | Allowed CUDA | 12.8 |
 
@@ -85,7 +85,7 @@ Environment variables (set on the endpoint, not committed):
 
 Any settings not listed here are left at RunPod defaults.
 
-## AWQ Quantization
+## AWQ Quantization (for vLLM usage)
 
 `quantize_awq_llm-compressor.ipynb` quantizes the 14B Qwen3 model to AWQ 4-bit using **llm-compressor**. Requires an A100 (40 GB+) pod and takes ~30-45 minutes.
 
