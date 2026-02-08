@@ -57,7 +57,7 @@ def stream_response(message: str):
             }
         ],
         temperature=0.3,
-        frequency_penalty=1.4,
+        frequency_penalty=1.1,
         logit_bias=LOGIT_BIAS,
         stream=True
     )

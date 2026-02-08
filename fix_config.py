@@ -1,8 +1,7 @@
 """
 Fix Saudi-Judge-AWQ config.json for vLLM compatibility.
 
-This script removes the 'scale_dtype' and 'zp_dtype' fields that are 
-not supported by older vLLM versions used in RunPod workers.
+Removes 'scale_dtype' and 'zp_dtype' fields unsupported by older vLLM workers.
 """
 import requests
 import json
@@ -14,9 +13,7 @@ OUTPUT_FILE = "config_fixed.json"
 def remove_unsupported_fields(obj):
     """Recursively remove unsupported fields from config."""
     if isinstance(obj, dict):
-        # Fields to remove (not supported by RunPod's vLLM version)
         fields_to_remove = ['scale_dtype', 'zp_dtype']
-        
         return {
             k: remove_unsupported_fields(v) 
             for k, v in obj.items() 
@@ -37,11 +34,9 @@ def main():
     
     original_config = r.json()
     
-    # Fix the config
     print("Removing unsupported fields (scale_dtype, zp_dtype)...")
     fixed_config = remove_unsupported_fields(original_config)
     
-    # Save the fixed config
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         json.dump(fixed_config, f, indent=2, ensure_ascii=False)
     
