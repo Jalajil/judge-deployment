@@ -1,4 +1,4 @@
-# القاضي السعودي - Saudi Judge
+# Saudi Judge - القاضي السعودي
 
 A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court cases. Given the facts of a case, it generates the court's reasoning and verdict text for both first-instance and appeal courts.
 
