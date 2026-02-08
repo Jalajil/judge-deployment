@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القاضي السعودي | Saudi Judge AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-tertiary: #27272a;
+            --accent: #005430;
+            --accent-dim: #003d23;
+            --accent-glow: rgba(0, 84, 48, 0.15);
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border: #3f3f46;
+            --user-bubble: #003d23;
+            --ai-bubble: #27272a;
+            --thinking-bg: #1a1a1d;
+            --thinking-border: #52525b;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo { font-size: 1.5rem; }
+        
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent), #00a66b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding-bottom: 0.25rem;
+            line-height: 1.6;
+        }
+        
+        .status {
+            margin-right: auto;
+            margin-left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+        }
+        
+        .message.user { align-self: flex-start; }
+        .message.ai { align-self: flex-end; }
+        
+        .bubble {
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        .user .bubble {
+            background: var(--user-bubble);
+        }
+        
+        .ai .bubble {
+            background: transparent;
+            border: none;
+        }
+        
+        /* Thinking Dropdown - ChatGPT Style */
+        .thinking-dropdown {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem 0.25rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        
+        .thinking-header:hover {
+            background: transparent;
+        }
+        
+        .thinking-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+        
+        .thinking-icon svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s;
+        }
+        
+        .thinking-dropdown.open .thinking-icon svg {
+            transform: rotate(90deg);
+        }
+        
+        .thinking-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .thinking-title .timer {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        .thinking-dots {
+            display: flex;
+            gap: 3px;
+            margin-right: auto;
+            margin-left: 0.5rem;
+        }
+        
+        .thinking-dots span {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .thinking-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .thinking-dots span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .thinking-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .thinking-dropdown.open .thinking-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .thinking-content-inner {
+            padding: 0.25rem 1rem 0.5rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
+        }
+        
+        /* Active thinking indicator */
+        .thinking-active .thinking-header {
+            background: transparent;
+        }
+        
+        .input-area {
+            padding: 1rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 1rem;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.6rem 1rem 0.6rem 1.25rem;
+            transition: border-color 0.2s;
+            order: 1;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+        }
+        
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            min-height: 24px;
+            max-height: 150px;
+            display: flex;
+            align-items: center;
+        }
+        
+        textarea::placeholder { color: var(--text-muted); padding-right: 0.5rem; }
+        
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.5rem 1.25rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover {
+            background: var(--accent-dim);
+            transform: none;
+        }
+        
+        .send-btn:disabled {
+            background: var(--text-muted);
+        }
+        
+        .suggested-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            order: 2;
+        }
+        
+        .prompt-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 2rem;
+        }
+        
+        .prompt-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            transform: none;
+        }
+        
+        .welcome {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .welcome h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        
+        /* Streaming cursor - shimmer sweep */
+        .streaming-cursor {
+            display: inline-block;
+            margin-right: 2px;
+            background: linear-gradient(
+                90deg,
+                var(--text-muted) 0%,
+                var(--text-muted) 40%,
+                var(--text-primary) 50%,
+                var(--text-muted) 60%,
+                var(--text-muted) 100%
+            );
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 2s infinite linear;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -100% 0; }
+            100% { background-position: 100% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>القاضي السعودي</h1>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>متصل</span>
+            </div>
+        </header>
+        
+        <div class="chat-area" id="chat">
+            <div class="welcome">
+                <h2>مرحباً بك في القاضي السعودي</h2>
+                <p>اعطني قضية وسأقوم بتوقع نص الحكم والاسباب</p>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea id="input" placeholder="اكتب سؤالك القانوني هنا..." rows="1"></textarea>
+                <button id="send" class="send-btn" onclick="sendMessage()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="suggested-prompts">
+                <button class="prompt-btn" onclick="usePrompt(this)">ما هي عقوبة السرقة؟</button>
+                <button class="prompt-btn" onclick="usePrompt(this)">كيف يتم تقسيم الميراث؟</button>
+                <button class="prompt-btn" onclick="usePrompt(this)">ما هي حقوق المرأة في الطلاق؟</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - Production (Vercel)
+        // ============================================
+        const CHAT_URL = '/api/chat';
+        const HEALTH_URL = '/api/health';
+        
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('send');
+        const statusDot = document.querySelector('.status-dot');
+        const statusText = document.querySelector('.status span:last-child');
+        
+        // Check backend health on load
+        async function checkHealth() {
+            try {
+                const response = await fetch(HEALTH_URL);
+                const data = await response.json();
+                console.log('Health check:', data);
+                
+                if (data.status === 'ok' && data.configured) {
+                    statusDot.style.background = '#22c55e';
+                    statusText.textContent = 'متصل';
+                } else if (data.status === 'ok') {
+                    statusDot.style.background = '#f59e0b';
+                    statusText.textContent = 'غير مهيأ';
+                } else {
+                    statusDot.style.background = '#f59e0b';
+                    statusText.textContent = 'حالة غير معروفة';
+                }
+            } catch (error) {
+                console.error('Health check failed:', error);
+                statusDot.style.background = '#ef4444';
+                statusText.textContent = 'غير متصل';
+            }
+        }
+        
+        // Check health on page load and periodically
+        checkHealth();
+        setInterval(checkHealth, 30000);
+        
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+            applyDirection(input, input.value);
+        });
+        
+        function usePrompt(btn) {
+            input.value = btn.textContent;
+            sendMessage();
+        }
+        
+        function addMessage(content, isUser) {
+            const welcome = chat.querySelector('.welcome');
+            if (welcome) welcome.remove();
+            
+            const msg = document.createElement('div');
+            msg.className = `message ${isUser ? 'user' : 'ai'}`;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = formatContent(content);
+            applyDirection(bubble, content);
+            msg.appendChild(bubble);
+            chat.appendChild(msg);
+            chat.scrollTop = chat.scrollHeight;
+            return msg;
+        }
+        
+        function createThinkingDropdown() {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'thinking-dropdown thinking-active';
+            dropdown.innerHTML = `
+                <div class="thinking-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="thinking-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="thinking-title">
+                        <span>جارٍ التفكير</span>
+                        <span class="timer"></span>
+                    </div>
+                    <div class="thinking-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                <div class="thinking-content">
+                    <div class="thinking-content-inner"></div>
+                </div>
+            `;
+            return dropdown;
+        }
+        
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+        
+        function postProcess(text) {
+            return text.replace(/\n?(نص حكم الابتدائية:)\n?/g, '\n\n$1\n');
+        }
+        
+        function formatContent(text) {
+            text = postProcess(text);
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/### (.*?)(\n|$)/g, '<h4>$1</h4>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        function formatThinking(text) {
+            return escapeHtml(text).replace(/\n/g, '<br>');
+        }
+        
+        function detectDirection(text) {
+            // Find first letter (skip whitespace, punctuation, numbers)
+            const match = text.match(/[\p{L}]/u);
+            if (!match) return 'rtl';
+            const firstLetter = match[0];
+            // Arabic Unicode range: \u0600-\u06FF
+            const isArabic = /[\u0600-\u06FF]/.test(firstLetter);
+            return isArabic ? 'rtl' : 'ltr';
+        }
+        
+        function applyDirection(element, text) {
+            const dir = detectDirection(text);
+            element.style.direction = dir;
+            element.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+        }
+        
+        function parseThinking(fullText) {
+            // Parse <think>...</think> tags from Qwen model (handles unclosed tags too)
+            // Only detect <think> if it's at the very beginning (after trimming whitespace)
+            let thinking = '';
+            let response = fullText;
+            let isThinkingComplete = true;
+            
+            const trimmed = fullText.trimStart();
+            if (!trimmed.startsWith('<think>')) {
+                return { thinking, response, isThinkingComplete };
+            }
+            
+            const openTagIndex = fullText.indexOf('<think>');
+            const closeTagIndex = fullText.lastIndexOf('</think>');
+            
+            if (closeTagIndex !== -1 && closeTagIndex > openTagIndex) {
+                thinking = fullText.substring(openTagIndex + 7, closeTagIndex);
+                response = fullText.substring(closeTagIndex + 8).trim();
+            } else {
+                thinking = fullText.substring(openTagIndex + 7);
+                response = '';
+                isThinkingComplete = false;
+            }
+            
+            return { thinking, response, isThinkingComplete };
+        }
+        
+        async function sendMessage() {
+            const text = input.value.trim();
+            if (!text) return;
+            
+            input.value = '';
+            input.style.height = 'auto';
+            sendBtn.disabled = true;
+            
+            addMessage(text, true);
+            
+            // Create AI message container
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'message ai';
+            
+            // Add thinking dropdown (hidden initially)
+            const thinkingDropdown = createThinkingDropdown();
+            thinkingDropdown.style.display = 'none';
+            aiMsg.appendChild(thinkingDropdown);
+            
+            // Add response bubble
+            const responseBubble = document.createElement('div');
+            responseBubble.className = 'bubble';
+            responseBubble.innerHTML = '<span class="streaming-cursor">الرجاء الانتظار</span>';
+            aiMsg.appendChild(responseBubble);
+            
+            chat.appendChild(aiMsg);
+            chat.scrollTop = chat.scrollHeight;
+            
+            const thinkingContent = thinkingDropdown.querySelector('.thinking-content-inner');
+            const timerEl = thinkingDropdown.querySelector('.timer');
+            const thinkingDots = thinkingDropdown.querySelector('.thinking-dots');
+            
+            // Timer variables (starts when <think> is detected)
+            let thinkingStartTime = null;
+            let timerInterval = null;
+            
+            let fullText = '';
+            
+            try {
+                console.log('Streaming from backend...');
+                const response = await fetch(CHAT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (line === '' || line.startsWith(':')) continue;
+                        
+                        if (line.startsWith('data:')) {
+                            let data = line.slice(5);
+                            if (data.startsWith(' ')) data = data.slice(1);
+                            
+                            if (data === '[DONE]') {
+                                console.log('Stream complete');
+                                continue;
+                            }
+                            
+                            fullText += data;
+                        } else {
+                            fullText += '\n' + line;
+                        }
+                        
+                        // Update UI with streaming content
+                        const { thinking, response: responseText, isThinkingComplete } = parseThinking(fullText);
+                        
+                        if (thinking) {
+                            if (!thinkingStartTime) {
+                                thinkingStartTime = Date.now();
+                                thinkingDropdown.style.display = '';
+                                timerInterval = setInterval(() => {
+                                    const elapsed = Math.floor((Date.now() - thinkingStartTime) / 1000);
+                                    timerEl.textContent = `${elapsed}s`;
+                                }, 1000);
+                            }
+                            if (isThinkingComplete && timerInterval) {
+                                clearInterval(timerInterval);
+                                timerInterval = null;
+                                const elapsed = Math.floor((Date.now() - thinkingStartTime) / 1000);
+                                timerEl.textContent = `فكّر لمدة ${elapsed} ثانية`;
+                            }
+                            thinkingContent.textContent = thinking;
+                            thinkingDropdown.classList.add('open');
+                        }
+                        
+                        // Only show response when we have actual response content
+                        if (responseText) {
+                            applyDirection(responseBubble, responseText);
+                            responseBubble.innerHTML = formatContent(responseText) + '<span class="streaming-cursor">▌</span>';
+                        } else if (!thinking) {
+                            // No thinking tags, show full text directly
+                            applyDirection(responseBubble, fullText);
+                            responseBubble.innerHTML = formatContent(fullText) + '<span class="streaming-cursor">▌</span>';
+                        }
+                        
+                        chat.scrollTop = chat.scrollHeight;
+                    }
+                }
+                
+                if (timerInterval) clearInterval(timerInterval);
+                
+                // Final parse and render
+                const { thinking, response: responseText } = parseThinking(fullText);
+                
+                thinkingDropdown.classList.remove('thinking-active');
+                thinkingDots.style.display = 'none';
+                
+                if (thinking && thinking.length > 10) {
+                    const totalTime = thinkingStartTime ? Math.floor((Date.now() - thinkingStartTime) / 1000) : 0;
+                    thinkingContent.innerHTML = formatThinking(thinking);
+                    timerEl.textContent = `فكّر لمدة ${totalTime} ثانية`;
+                    thinkingDropdown.style.display = '';
+                    thinkingDropdown.classList.add('open');
+                } else {
+                    thinkingDropdown.style.display = 'none';
+                }
+                
+                // Show response, or full text if no thinking tags were used
+                const finalText = responseText || (thinking ? '' : fullText) || 'لم يتم استلام رد';
+                applyDirection(responseBubble, finalText);
+                responseBubble.innerHTML = formatContent(finalText);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                if (timerInterval) clearInterval(timerInterval);
+                thinkingDropdown.style.display = 'none';
+                responseBubble.innerHTML = 'خطأ في الاتصال: ' + error.message;
+            }
+            
+            sendBtn.disabled = false;
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+    </script>
+</body>
+</html>

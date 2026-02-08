@@ -27,7 +27,7 @@ These are configured on the endpoint (not committed as secrets). For local runs,
 
 ## Advanced
 
-- **Allowed CUDA versions**: `12.8`
+- **Allowed CUDA versions**: `12.8` 
 
 ## Notes
 
