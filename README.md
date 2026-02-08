@@ -1,8 +1,6 @@
 # Saudi Judge - القاضي السعودي
 
-A fine-tuned **Qwen3-14B** model that generates judicial rulings for Saudi court cases. Given case facts, it produces the court's reasoning and verdict text for both first-instance and appeal courts.
-
-**[القاضي السعودي — Saudi Judge](https://judge-deployment.vercel.app/)** — try the live demo.
+A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court cases. Given the facts of a case, it generates the court's reasoning and verdict text for both first-instance and appeal courts.
 
 The model is unable to answer any judicial question, it is trained specifically to predict the reasoning (الاسباب) and the verdict (نص الحكم) of a case.
 
@@ -16,7 +14,7 @@ To use the model please visit: **[القاضي السعودي — Saudi Judge](h
 
 ### Training Data
 
-The model was trained on **43,000+** judicial decisions scraped from the [Saudi Ministry of Justice judicial decisions portal](https://laws.moj.gov.sa/ar/JudicialDecisionsList/1?pageNumber=1&pageSize=12&viewType=grid&courtTypes=1&sortingBy=3), plus **~15,000** reasoning-augmented math examples to preserve the base model's chain-of-thought reasoning capability during fine-tuning. The raw verdicts went through an extensive cleaning pipeline before training:
+The model was trained on **43,000+** judicial decisions scraped from the [Saudi Ministry of Justice judicial decisions portal](https://laws.moj.gov.sa/ar/JudicialDecisionsList/1?pageNumber=1&pageSize=12&viewType=grid&courtTypes=1&sortingBy=3), plus **~15,000** reasoning-augmented math examples, yes it is unrelated to our case but it is used to retain the reasoning capability of the model. The raw verdicts went through an extensive cleaning pipeline before training:
 
 1. **Header normalization** — recognizing and standardizing section headers (الوقائع / الأسباب / نص الحكم) across dozens of aliases, bracketed forms, and corrupted variants.
 2. **NER anonymization** — replacing person names, organizations, and locations with placeholders (`[PER-1]`, `[ORG-2]`, `[LOC-3]`) using CAMeL Tools NER, with special handling for judge signatures, proxy numbers, and invoice numbers.
