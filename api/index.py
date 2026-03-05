@@ -113,11 +113,10 @@ async def health():
         return {"worker_status": "no_workers"}
 
     idle_count = workers.get("idle", 0)
-    ready_count = workers.get("ready", 0)
     running_count = workers.get("running", 0)
     initializing_count = workers.get("initializing", 0)
 
-    if ready_count + running_count > 0:
+    if running_count > 0:
         result = {"worker_status": "ready"}
     elif idle_count > 0:
         result = {"worker_status": "idle"}
