@@ -112,9 +112,16 @@ async def health():
     except Exception:
         return {"worker_status": "no_workers"}
 
-    if workers.get("idle", 0) + workers.get("ready", 0) + workers.get("running", 0) > 0:
+    idle_count = workers.get("idle", 0)
+    ready_count = workers.get("ready", 0)
+    running_count = workers.get("running", 0)
+    initializing_count = workers.get("initializing", 0)
+
+    if ready_count + running_count > 0:
         result = {"worker_status": "ready"}
-    elif workers.get("initializing", 0) > 0:
+    elif idle_count > 0:
+        result = {"worker_status": "idle"}
+    elif initializing_count > 0:
         result = {"worker_status": "initializing"}
     else:
         result = {"worker_status": "no_workers"}
