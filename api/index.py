@@ -1,9 +1,11 @@
 import json
 import os
 from pathlib import Path
+from time import monotonic
 
+import httpx
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from openai import OpenAI
 from pydantic import BaseModel
@@ -25,13 +27,13 @@ if RUNPOD_API_KEY and ENDPOINT_ID:
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 
 class ChatRequest(BaseModel):
@@ -58,6 +60,7 @@ def stream_response(message: str):
         ],
         temperature=0.3,
         frequency_penalty=1.1,
+        # presence_penalty=1.1, Could be used alongside frequency_penalty to prevent repetition by nudging the model to use new words and topics.
         logit_bias=LOGIT_BIAS,
         stream=True
     )
@@ -86,9 +89,35 @@ async def chat(request: ChatRequest):
     )
 
 
+_http = httpx.AsyncClient(timeout=5)
+_health_cache: dict = {"ts": 0.0, "val": {"worker_status": "no_workers"}}
+_CACHE_TTL = 5.0
+
+
 @app.get("/api/health")
 async def health():
-    return {
-        "status": "ok",
-        "configured": client is not None,
-    }
+    if not client:
+        return {"worker_status": "no_workers"}
+
+    now = monotonic()
+    if now - _health_cache["ts"] < _CACHE_TTL:
+        return _health_cache["val"]
+
+    try:
+        resp = await _http.get(
+            f"https://api.runpod.ai/v2/{ENDPOINT_ID}/health",
+            headers={"Authorization": f"Bearer {RUNPOD_API_KEY}"},
+        )
+        workers = resp.json().get("workers", {})
+    except Exception:
+        return {"worker_status": "no_workers"}
+
+    if workers.get("idle", 0) + workers.get("ready", 0) + workers.get("running", 0) > 0:
+        result = {"worker_status": "ready"}
+    elif workers.get("initializing", 0) > 0:
+        result = {"worker_status": "initializing"}
+    else:
+        result = {"worker_status": "no_workers"}
+
+    _health_cache.update(ts=now, val=result)
+    return result
