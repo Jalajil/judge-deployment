@@ -382,6 +382,9 @@
                 <span></span>
             </div>
         </header>
+        <div style="padding: 0 1.5rem 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+            قد تستغرق أول رسالة ٢-٣ دقائق حتى يتم الرد.
+        </div>
         
         <div class="chat-area" id="chat">
             <div class="welcome">
@@ -419,15 +422,17 @@
         const sendBtn = document.getElementById('send');
         const statusDot = document.querySelector('.status-dot');
         const statusText = document.querySelector('.status span:last-child');
+        let currentStatus = null;
         
         const STATUS_MAP = {
             ready:        { color: '#22c55e', text: 'Worker is ready' },
             idle:         { color: '#9ca3af', text: 'Worker is idle' },
-            initializing: { color: '#f59e0b', text: 'Workers initializing' },
+            initializing: { color: '#3b82f6', text: 'Initializing worker' },
             no_workers:   { color: '#ef4444', text: 'No running workers' },
         };
 
         function setStatus(key) {
+            currentStatus = key;
             const s = STATUS_MAP[key] || STATUS_MAP.no_workers;
             statusDot.style.background = s.color;
             statusText.textContent = s.text;
@@ -575,6 +580,10 @@
         async function sendMessage() {
             const text = input.value.trim();
             if (!text) return;
+            
+            if (currentStatus === 'idle') {
+                setStatus('initializing');
+            }
             
             input.value = '';
             input.style.height = 'auto';
