@@ -59,7 +59,7 @@ def stream_response(message: str):
             }
         ],
         temperature=0.3,
-        frequency_penalty=1.1,
+        frequency_penalty=1.6,
         # presence_penalty=1.1, Could be used alongside frequency_penalty to prevent repetition by nudging the model to use new words and topics.
         logit_bias=LOGIT_BIAS,
         stream=True
