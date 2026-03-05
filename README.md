@@ -4,7 +4,7 @@ A fine-tuned **Qwen3-14B** model that predicts judicial rulings for Saudi court 
 
 The model is unable to answer any judicial question, it is trained specifically to predict the reasoning (الاسباب) and the verdict (نص الحكم) of a case.
 
-To use the model please visit: **[القاضي السعودي — Saudi Judge](https://judge-deployment.vercel.app/)**
+To use the model please visit: **[القاضي السعودي — Saudi Judge](https://www.cliberai.com/)**
 
 ## Model Capabilities
 
