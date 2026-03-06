@@ -58,6 +58,7 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: #00a66b;
+            color: color(srgb 0 0.6510 0.4196);
             padding-bottom: 0.25rem;
             line-height: 1.6;
         }
@@ -101,7 +102,7 @@
         }
         
         .message.user { align-self: flex-start; }
-        .message.ai { align-self: flex-end; }
+        .message.ai { align-self: stretch; }
         
         .bubble {
             padding: 1rem 1.25rem;
@@ -117,6 +118,8 @@
         .ai .bubble {
             background: transparent;
             border: none;
+            padding-right: 0;
+            padding-left: 0;
         }
         
         /* Thinking Dropdown - ChatGPT Style */
@@ -226,7 +229,15 @@
             padding: 1rem 1.5rem 1.5rem;
             display: flex;
             flex-direction: column-reverse;
-            gap: 1rem;
+            gap: 0.5rem;
+        }
+        
+        .input-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 0.25rem 0;
+            order: 0;
         }
         
         .input-wrapper {
@@ -351,7 +362,9 @@
         
         /* Streaming cursor - shimmer sweep */
         .streaming-cursor {
-            display: inline-block;
+            display: inline;
+            vertical-align: middle;
+            line-height: 1;
             margin-right: 2px;
             background: linear-gradient(
                 90deg,
@@ -383,9 +396,6 @@
                 <span></span>
             </div>
         </header>
-        <div style="padding: 0 1.5rem 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
-            قد تستغرق أول رسالة ٢-٣ دقائق حتى يتم الرد.
-        </div>
         
         <div class="chat-area" id="chat">
             <div class="welcome">
@@ -404,6 +414,7 @@
                     </svg>
                 </button>
             </div>
+            <div class="input-note">قد تستغرق أول رسالة ٢-٣ دقائق حتى يتم الرد.</div>
             <div class="suggested-prompts">
                 <button class="prompt-btn" onclick="usePrompt(this)" data-prompt="بناءً على القضية الابتدائية التالية، اكتب اسباب الابتدائية ونص حكم الابتدائية.\n\nوقائع الابتدائية:\nتتلخص وقائع هذه الدعوى في أنه سبق أن تقدم وكيل المدعية الموضحة بياناتها أعلاه بلائحة دعوى إلى المحكمة التجارية بالرياض ذكر فيها: أنه اتفق أطراف الدعوى على أن تورد المدعية للمدعى عليها خضار وفواكه، وتاريخ ابتداء التعامل 1443/09/24ه بثمن إجمالي قدره (193,745) مائة وثلاثة وتسعون ألفًا وسبعمائة وخمسة وأربعون ريالاً، وقد استلمت المدعى عليها كامل المبيع، وطالب بإلزام المدعى عليها بتسليم مبلغ العربون وقدره (193,745) مائة وثلاثة وتسعون ألفًا وسبعمائة وخمسة وأربعون ريالاً، وعقدت الدائرة جلسة مرئية في 1444/03/29ه وملخصها: حضر وكيل المدعية، ولم يحضر من يمثل المدعى عليها، وبسؤال المدعي وكالة عن دعوى موكلته وحصر طلباته وبيناته، فأحال على ما ورد في صحيفة الدعوى، وإلى الطلبات والبينات والأسانيد فيها، وقررت الدائرة صلاحية القضية للحكم وقفل باب المرافعة.">مثال: قضية ابتدائية</button>
                 <button class="prompt-btn" onclick="usePrompt(this)" data-prompt="بناءً على قضية الاستئناف التالية، اكتب اسباب الاستئناف ونص حكم الاستئناف.\n\nوقائع الابتدائية:\nتتحصل وقائع الدعوى بالقدر اللازم لإصدار هذا الحكم في تقدم وكيل المدعي/ (...)، يحمل الهوية الوطنية رقم (...)، إلى المحكمة التجارية بالدمام بصحيفة دعوى يختصم فيها المدعى عليها، وأفاد في صحيفته بأن المدعي ساهم في تأسيس الشركة المدعى عليها، وشغل منصب رئيس مجلس إدارتها والعضو المنتدب للقيام بالأعمال الإدارية منذ تأسيسها في عام 2012م إلى بداية شهر يناير من عام 2014م، ثم عينت الشركة المدعى عليها مديراً عاماً في تاريخ 9/1/2013م إلى أن تقدم باستقالته في تاريخ 2/3/2014م، وتم تكليف المدعي ليتولى الأعمال الإدارية مؤقتاً، واستمر المدعي كعضو منتدب من تاريخ 12/3/2014م إلى تاريخ 1/11/2016م، وقرر مجلس إدارة المدعى عليها منح المدعي مبلغ مئتان ألف ريال (200,000) ريال مقابل أعماله الإدارية التي قدمها خلال فترة ثلاثة وثلاثون شهراً، واعترض المدعي على التعويض المقدر وتمسكت المدعى عليها به، وتقدم المدعي بالإخطار بالوفاء بتاريخ 30/12/2020م وعدلت المدعى عليها المبلغ المستحق إلى عشرة آلاف ريال (10,000) ريال شهرياً، بمجموع قدره ثلاثمائة وعشرة آلاف ريال (310,000) ريال، وحيث إن المدعي قد قام بالأعمال الموكلة إليه لمدة (33) شهراً وكذلك مدة (20) شهراً السابقة. وحيث إن التعويض عن الأعمال الإدارية وفقاً لتقدير الشركة وفقاً لخطابها المؤرخ في 13/1/2021م المقدر ب (10,000) عشرة آلاف ريال لم يلاق قبولاً من المدعي. وحيث جرى العمل في الشركة المدعى عليها أنها تمنح مبلغاً قدره (53,250) ثلاثة وخمسون ألفاً ومئتان وخمسون ريالاً شهرياً. ولما كان العضو المنتدب كٌلف بمهام إدارية لتسيير أعمال الشركة وهي لا تختلف عن مهام المدير التنفيذي الأمر الذي يستوجب الأخذ بعين الاعتبار ما صرفته الشركة للمدير السابق كأساس للاحتساب. وحيث إن الثابت من المستندات أن المدعى عليها تنازع في مقدار ما يستحقه المدعي وقدرته بمبلغ عشرة آلاف، وختم مذكرته بطلب إلزام المدعى عليها بدفع مبلغ قدره 2,822,250 نظير الأعمال التي كلف بها بصفته عضواً منتدباً جاء تفصيلها على النحو التالي: أولاً: إلزام المدعى عليها بتعويض المدعى بمبلغ وقدره (1,065,000) ريال مقابل (20شهراً) من الفترة (18/04/2012م إلى 01/01/2014م). ثانياً: إلزام المدعى عليها بإلزامها تعويض المدعي بمبلغ قدره (1,757,250) ريال مقابل (33شهراً) من الفترة (12/03/2014م إلى 01/11/2016م). ليصبح إجمالي المطالبة مبلغ وقدره (2,822,250) ريال. وفي سبيل نظر الدعوى عقدت الدائرة جلستها في يوم الثلاثاء 04/07/1442ه، حضر وكيل المدعي/ (...)، يحمل الهوية الوطنية رقم (...) بوكالة رقم (...)، كما حضر وكيل المدعى عليها/ (...)، يحمل الهوية الوطنية رقم (...)، واطلعت الدائرة على صحيفة الدعوى فتبين لها ما يؤثر على انعقاد الاختصاص لذا رفعت الجلسة للمداولة وإصدار الحكم.\n\nاسباب الابتدائية:\nفبناء على ما تقدم من الدعوى ولكون المدعي يهدف من إقامة دعواه إلى المطالبة بالمبلغ الوارد في صحيفة الدعوى نظير الأعمال التي كلف بها بصفته عضواً منتدباً للمدعى عليها قائما بمهام عمل المدير التنفيذي محتسبا أجر ذلك على أساس احتساب أجر المدير التنفيذي المعين سابقا، ولكون البحث في مسائل الاختصاص وشمول الدعوى المنظورة بولاية المحكمة مقدم على نظر أصل الحق، ولسماع الدائرة القدر الكافي الذي تستطيع معه البت في مسألة الاختصاص ولكون جوهر النزاع القائم متفرع عن علاقة عمل قائمة على أساس تبعية العامل لرب العمل وإشرافه المباشر على مهام عمله، يتمثل ذلك في صدور قرار الشركاء في تكليف المدعي بأعمال المدير التنفيذي، وهي إرادة صريحة أنشأت العلاقة العمالية وإن لم تكن مفرغة في قالب تعاقدي، لما جاء في المادة الثانية من نظام العمل والتي عرفت العمل بأنه &quot;الجهد المبذول في النشاطات الإنسانية كافة، تنفيذًا لعقد عمل (مكتوب أو غير مكتوب) بصرف النظر عن طبيعتها أو نوعها&quot;، يعضد ذلك طلب المدعي إلزام المدعى عليها بدفع أجره المبنى على احتساب أجر المدير التنفيذي السابق، الأمر الذي تنتهي معه الدائرة إلى عدم انعقاد الاختصاص لنظر النزاع القائم.\n\nنص حكم الابتدائية:\nحكمت الدائرة بعدم قبول الدعوى المقامة من المدعي/ (...) - هوية وطنية رقم (...)، ضد المدعى عليها/ شركة (...) للخدمات المساندة مساهمة مقفلة - سجل تجاري رقم (...) لما هو موضح بالأسباب والله الموفق وصلى الله على نبينا محمد وعلى آله وصحبه وسلم.\n\nوقائع الاستئناف:\nتتلخص واقعات هذه القضية بما أورده الحكم محل الاعتراض؛ وتحيل إليه الدائرة وقائع وأسباباً وفقًا للمادة (76/2) من نظام المحاكم التجارية، وقد أصدرت الدائرة ناظرة القضية حكمها فيها القاضي بعدم قبول الدعوى المقامة من (...) هوية وطنية رقم (...) ضد المدعى عليها شركة (...) للخدمات المساندة مساهمة مقفلة سجل تجاري رقم (...) وقد اعترض على ذلك وكيل المدعية، حيث قدم اعتراضه المرفق بملف القضية المتضمن (إن المدعي عضواً منتدباً في المدعى عليها ويمارس الأعمال الإدارية فيها، و طبيعة عمل العضو المنتدب تختلف عن طبيعة العامل حيث يمارس أعماله من دون تبعية فلا يحكمها نظام العمل، ومنشأ الاستحقاق في هذه المطالبة ناشئا عن تطبيق نظام الشركات فتكون داخلة في اختصاص المحكمة التجارية استنادا إلى الفقرة الرابعة من المادة (16) من نظام المحاكم التجارية، وطلب إلغاء الحكم)، وبإحالة القضية إلى هذه الدائرة اطلعت على ملفها والحكم الصادر فيها والاعتراض المقدم عليه، و رأت رفع الجلسة للمداولة وإصدار الحكم.">مثال: قضية استئناف</button>
@@ -536,11 +547,9 @@
         }
         
         function detectDirection(text) {
-            // Find first letter (skip whitespace, punctuation, numbers)
             const match = text.match(/[\p{L}]/u);
             if (!match) return 'rtl';
             const firstLetter = match[0];
-            // Arabic Unicode range: \u0600-\u06FF
             const isArabic = /[\u0600-\u06FF]/.test(firstLetter);
             return isArabic ? 'rtl' : 'ltr';
         }
@@ -552,8 +561,6 @@
         }
         
         function parseThinking(fullText) {
-            // Parse <think>...</think> tags from Qwen model (handles unclosed tags too)
-            // Only detect <think> if it's at the very beginning (after trimming whitespace)
             let thinking = '';
             let response = fullText;
             let isThinkingComplete = true;
@@ -592,16 +599,13 @@
             
             addMessage(text, true);
             
-            // Create AI message container
             const aiMsg = document.createElement('div');
             aiMsg.className = 'message ai';
             
-            // Add thinking dropdown (hidden initially)
             const thinkingDropdown = createThinkingDropdown();
             thinkingDropdown.style.display = 'none';
             aiMsg.appendChild(thinkingDropdown);
             
-            // Add response bubble
             const responseBubble = document.createElement('div');
             responseBubble.className = 'bubble';
             responseBubble.innerHTML = '<span class="streaming-cursor">الرجاء الانتظار</span>';
@@ -614,7 +618,6 @@
             const timerEl = thinkingDropdown.querySelector('.timer');
             const thinkingDots = thinkingDropdown.querySelector('.thinking-dots');
             
-            // Timer variables (starts when <think> is detected)
             let thinkingStartTime = null;
             let timerInterval = null;
             
@@ -662,7 +665,6 @@
                             fullText += '\n' + line;
                         }
                         
-                        // Update UI with streaming content
                         const { thinking, response: responseText, isThinkingComplete } = parseThinking(fullText);
                         
                         if (thinking) {
@@ -684,12 +686,10 @@
                             thinkingDropdown.classList.add('open');
                         }
                         
-                        // Only show response when we have actual response content
                         if (responseText) {
                             applyDirection(responseBubble, responseText);
                             responseBubble.innerHTML = formatContent(responseText) + '<span class="streaming-cursor">▌</span>';
                         } else if (!thinking) {
-                            // No thinking tags, show full text directly
                             applyDirection(responseBubble, fullText);
                             responseBubble.innerHTML = formatContent(fullText) + '<span class="streaming-cursor">▌</span>';
                         }
@@ -700,7 +700,6 @@
                 
                 if (timerInterval) clearInterval(timerInterval);
                 
-                // Final parse and render
                 const { thinking, response: responseText } = parseThinking(fullText);
                 
                 thinkingDropdown.classList.remove('thinking-active');
@@ -716,7 +715,6 @@
                     thinkingDropdown.style.display = 'none';
                 }
                 
-                // Show response, or full text if no thinking tags were used
                 const finalText = responseText || (thinking ? '' : fullText) || 'لم يتم استلام رد';
                 applyDirection(responseBubble, finalText);
                 responseBubble.innerHTML = formatContent(finalText);
