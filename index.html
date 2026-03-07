@@ -58,6 +58,9 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: #00a66b;
+            /* FIX: explicitly set -webkit-text-fill-color to prevent iOS Safari
+               from inheriting transparent fill from .streaming-cursor nearby */
+            -webkit-text-fill-color: #00a66b;
             padding-bottom: 0.25rem;
             line-height: 1.6;
         }
@@ -108,6 +111,9 @@
             border-radius: 1rem;
             line-height: 1.7;
             font-size: 0.95rem;
+            /* FIX: protect bubble text color on iOS Safari */
+            color: var(--text-primary);
+            -webkit-text-fill-color: var(--text-primary);
         }
         
         .user .bubble {
@@ -163,6 +169,8 @@
         .thinking-title {
             font-size: 0.85rem;
             color: var(--text-secondary);
+            /* FIX: protect thinking-title text on iOS Safari */
+            -webkit-text-fill-color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -170,6 +178,7 @@
         
         .thinking-title .timer {
             color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
             font-size: 0.8rem;
         }
         
@@ -212,6 +221,7 @@
             font-size: 0.85rem;
             line-height: 1.6;
             color: var(--text-secondary);
+            -webkit-text-fill-color: var(--text-secondary);
             font-family: 'JetBrains Mono', monospace;
             white-space: pre-wrap;
             direction: ltr;
@@ -234,6 +244,7 @@
         .input-note {
             font-size: 0.8rem;
             color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
             text-align: center;
             padding: 0.25rem 0;
             order: 0;
@@ -260,6 +271,8 @@
             background: transparent;
             border: none;
             color: var(--text-primary);
+            /* FIX: ensure textarea text is always visible on iOS Safari */
+            -webkit-text-fill-color: var(--text-primary);
             font-family: inherit;
             font-size: 1rem;
             resize: none;
@@ -270,11 +283,16 @@
             align-items: center;
         }
         
-        textarea::placeholder { color: var(--text-muted); padding-right: 0.5rem; }
+        textarea::placeholder {
+            color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
+            padding-right: 0.5rem;
+        }
         
         button {
             background: var(--accent);
             color: white;
+            -webkit-text-fill-color: white;
             border: none;
             border-radius: 0.75rem;
             padding: 0.5rem 1.25rem;
@@ -306,6 +324,7 @@
             justify-content: center;
             background: var(--accent);
             color: white;
+            -webkit-text-fill-color: white;
             flex-shrink: 0;
         }
         
@@ -330,6 +349,7 @@
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
             color: var(--text-secondary);
+            -webkit-text-fill-color: var(--text-secondary);
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
             border-radius: 2rem;
@@ -338,6 +358,7 @@
         .prompt-btn:hover {
             background: var(--border);
             color: var(--text-primary);
+            -webkit-text-fill-color: var(--text-primary);
             transform: none;
         }
         
@@ -345,11 +366,13 @@
             text-align: center;
             padding: 3rem 1rem;
             color: var(--text-secondary);
+            -webkit-text-fill-color: var(--text-secondary);
         }
         
         .welcome h2 {
             font-size: 1.5rem;
             color: var(--text-primary);
+            -webkit-text-fill-color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
         
@@ -359,7 +382,14 @@
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         
-        /* Streaming cursor - shimmer sweep */
+        /* FIX: streaming cursor is fully isolated so its -webkit-text-fill-color: transparent
+           cannot bleed into sibling or parent elements on iOS Safari.
+           The cursor wrapper uses isolation: isolate to create a new stacking context. */
+        .streaming-cursor-wrap {
+            display: inline;
+            isolation: isolate;
+        }
+
         .streaming-cursor {
             display: inline;
             vertical-align: middle;
@@ -607,7 +637,8 @@
             
             const responseBubble = document.createElement('div');
             responseBubble.className = 'bubble';
-            responseBubble.innerHTML = '<span class="streaming-cursor">الرجاء الانتظار</span>';
+            // FIX: wrap cursor in isolation span to prevent -webkit-text-fill-color bleed on iOS
+            responseBubble.innerHTML = '<span class="streaming-cursor-wrap"><span class="streaming-cursor">الرجاء الانتظار</span></span>';
             aiMsg.appendChild(responseBubble);
             
             chat.appendChild(aiMsg);
@@ -687,10 +718,11 @@
                         
                         if (responseText) {
                             applyDirection(responseBubble, responseText);
-                            responseBubble.innerHTML = formatContent(responseText) + '<span class="streaming-cursor">▌</span>';
+                            // FIX: cursor wrapped in isolation span
+                            responseBubble.innerHTML = formatContent(responseText) + '<span class="streaming-cursor-wrap"><span class="streaming-cursor">▌</span></span>';
                         } else if (!thinking) {
                             applyDirection(responseBubble, fullText);
-                            responseBubble.innerHTML = formatContent(fullText) + '<span class="streaming-cursor">▌</span>';
+                            responseBubble.innerHTML = formatContent(fullText) + '<span class="streaming-cursor-wrap"><span class="streaming-cursor">▌</span></span>';
                         }
                         
                         chat.scrollTop = chat.scrollHeight;
