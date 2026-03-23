@@ -1,0 +1,62 @@
+================================================================================
+CORS SECURITY RECOMMENDATION - Judge Deployment Project
+================================================================================
+
+CURRENT ISSUE:
+Your api/index.py has the following CORS configuration:
+  - allow_origins=["*"]
+  - allow_credentials=True
+
+This combination is risky if you add authentication/user data later.
+
+RECOMMENDATION:
+Change the CORS configuration to explicitly allow only your Vercel domain.
+
+UPDATED CODE:
+Instead of:
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=["*"],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+
+Use:
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=["https://yourdomain.vercel.app"],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+
+FOR DEVELOPMENT + PRODUCTION:
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=[
+          "https://judge-ai.vercel.app",      # Production domain
+          "http://localhost:3000",             # Local development
+          "http://localhost:8000",             # FastAPI dev server
+      ],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+
+WHY THIS MATTERS:
+1. Currently: Your app has no user authentication, so the risk is LOW
+2. Future: If you add authentication/user accounts, this becomes a SECURITY VULNERABILITY
+3. Best Practice: Explicitly whitelist domains instead of allowing everything (*)
+
+SECURITY BENEFIT:
+- Prevents Cross-Site Request Forgery (CSRF) attacks
+- Protects user data if you add authentication later
+- Follows industry security standards
+
+ACTION ITEMS:
+☐ Replace "yourdomain.vercel.app" with your actual Vercel domain
+☐ Update api/index.py with the new CORS configuration
+☐ Test locally first, then deploy to Vercel
+☐ If you add authentication later, this config will already be secure
+================================================================================
