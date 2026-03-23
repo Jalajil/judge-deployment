@@ -50,6 +50,23 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            justify-content: space-between;
+        }
+
+        .clear-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.5rem;
+            display: none;
+            align-items: center;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .clear-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
         }
         
         .logo { font-size: 1.5rem; }
@@ -390,10 +407,11 @@
     <div class="container">
         <header>
             <h1>القاضي السعودي</h1>
-            <div class="status">
-                <div class="status-dot"></div>
-                <span></span>
-            </div>
+            <button class="clear-btn" id="clearChat" onclick="clearChat()" title="محادثة جديدة">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+            </button>
         </header>
         
         <div class="chat-area" id="chat">
@@ -475,6 +493,54 @@
             applyDirection(input, input.value);
         });
         
+        // --- localStorage chat persistence ---
+        function saveChat() {
+            const msgs = [];
+            chat.querySelectorAll('.message').forEach(msg => {
+                const isUser = msg.classList.contains('user');
+                const bubble = msg.querySelector('.bubble');
+                if (bubble) msgs.push({ content: bubble.innerHTML, isUser });
+            });
+            localStorage.setItem('sj-chat', JSON.stringify(msgs));
+        }
+
+        function loadChat() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('sj-chat'));
+                if (!saved || !saved.length) return;
+                const welcome = chat.querySelector('.welcome');
+                if (welcome) welcome.remove();
+                saved.forEach(({ content, isUser }) => {
+                    const msg = document.createElement('div');
+                    msg.className = `message ${isUser ? 'user' : 'ai'}`;
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    bubble.innerHTML = content;
+                    msg.appendChild(bubble);
+                    chat.appendChild(msg);
+                });
+                chat.scrollTop = chat.scrollHeight;
+            } catch (e) {}
+        }
+
+        loadChat();
+        updateClearBtn();
+
+        function clearChat() {
+            localStorage.removeItem('sj-chat');
+            chat.innerHTML = `<div class="welcome">
+                <h2>مرحباً بك في القاضي السعودي</h2>
+                <p>اعطني قضية وسأقوم بتوقع نص الحكم والاسباب</p>
+            </div>`;
+            updateClearBtn();
+        }
+
+        function updateClearBtn() {
+            const btn = document.getElementById('clearChat');
+            const hasMessages = chat.querySelector('.message');
+            btn.style.display = hasMessages ? 'flex' : 'none';
+        }
+
         function usePrompt(btn) {
             const prompt = btn.dataset.prompt || btn.textContent;
             input.value = prompt.replace(/\\n/g, '\n');
@@ -727,6 +793,8 @@
             
             sendBtn.disabled = false;
             chat.scrollTop = chat.scrollHeight;
+            saveChat();
+            updateClearBtn();
         }
         
     </script>

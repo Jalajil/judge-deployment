@@ -27,14 +27,6 @@ if RUNPOD_API_KEY and ENDPOINT_ID:
 
 app = FastAPI()
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
 
 class ChatRequest(BaseModel):
     message: str
